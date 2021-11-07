@@ -1,8 +1,10 @@
-class CaeserCipher:
-  def __init__(self, key, message):
-    self.__shift = key # should it be key-1? or should we assume key takes values 0 onwards (say up to 25), but actually can be any integer the way the code has been written due to mod26 implementation
-    self.__plain_text = message
-    self.encrypted_text = self.encrypt(message, key)
+from cipher_symmetric import SymmetricCipherMixin 
+
+class CaeserCipher(SymmetricCipherMixin): #Q: SymmetricCipherInterface (add as superclass?)
+  def __init__(self, shift, message):
+    self._key = shift # should it be key-1? or should we assume key takes values 0 onwards (say up to 25), but actually can be any integer the way the code has been written due to mod26 implementation
+    self._plain_text = message
+    self.encrypted_text = self.encrypt(message, shift)
 
   @staticmethod
   def __letterValue(letter):
@@ -16,9 +18,9 @@ class CaeserCipher:
 
   def encrypt(self, plain_text=None, shift=None):
     if plain_text is None:
-      plain_text=self.__plain_text
+      plain_text=self._plain_text
     if shift is None:
-      shift=self.__shift
+      shift=self._key
     encrypted_text=''
     for letter in plain_text:
       encrypted_text += chr(self.__getShiftedAsciiValueFromLetterValue(self.__letterValue(letter), shift))
@@ -28,21 +30,12 @@ class CaeserCipher:
     if cipher_text is None:
       cipher_text=self.encrypted_text
     if shift is None:
-      shift=self.__shift
+      shift=self._key
     decrypted_text=''
     unshift = -shift
     for letter in cipher_text:
       decrypted_text += chr(self.__getShiftedAsciiValueFromLetterValue(self.__letterValue(letter), unshift))
     return decrypted_text
-
-  def updateMessage(self, plain_text): #TODO: move to superclass
-    self.__plain_text=plain_text
-    self.encrypted_text=self.encrypt(plain_text)
-    print(self.__shift)
-
-  def updateKey(self, key): #TODO: move to superclass
-    self.__shift = key
-    self.updateMessage(self.__plain_text)
 
 # TODO: turn print() statements below into tests
 # test class initialisation
@@ -67,7 +60,7 @@ class CaeserCipher:
 # how to comment code in a class? add versioning/author etc.
 
 # GET CODE REVIEW/FEEDBACK ON:
-# correct use of single/double underscores?
+# correct use of single/double underscores? in particular should i use double underscore for things like self.__key and __plain_text?
 # correct user of @staticmethod?
 # what variables should the class store?
 # which methods should be 'private' and which 'public'?
